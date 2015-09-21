@@ -27,7 +27,8 @@ def parse(rawfile, delimiter):
 
 
 def monthly_mean(docum):
-    """ Visualize daily Mean Temperature by date """
+    """ Plots a figure of the mean temperature throughout
+        the month """
 
     parsed = parse(docum, ',')
 
@@ -46,7 +47,7 @@ def monthly_mean(docum):
 
     fig, ax = plt.subplots()
 
-    f = ax.plot(dates, temps, color='royalblue')
+    ax.plot(dates, temps, color='royalblue')
 
     # Customizing appearance
     plt.ylabel('Mean Temperature C')
@@ -59,15 +60,17 @@ def monthly_mean(docum):
     plt.rcParams['font.size'] = 8
 
     # Saving figure and closing
-    plt.savefig('%s.png' % (str(docum)))
+    print str(docum).split('.')[0]
+
+    plt.savefig('%s.png' % (str(docum).split('.')[0]))
     plt.clf()
 
+
 def run():
+    """ Running monthly_mean for all the files in the directory """
+
     for f in glob.glob(path):
         print 'Processing ' + f.split('/')[-1]
         monthly_mean(f)
 
 run()
-
-#monthly_mean(F2000)
-#monthly_mean(F2001)
