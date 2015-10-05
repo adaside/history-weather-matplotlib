@@ -1,3 +1,9 @@
+# Playing with weather data sets and matplotlib
+# Author: Ada Vasileiou
+# Csv files include weather data for all the Septembers from 2000 to 2015
+# Location: SKG
+
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import dates as mpldates
@@ -46,10 +52,10 @@ def daily_mean(docum):
 
 
 
-def plot_daily(datetemp):
+def plot_daily(docum):
     """ Makes a figure of daily mean temperatures """
 
-    dates, temps = datetemp[0], datetemp[1]
+    dates, temps = daily_mean(docum)
 
     fig, ax = plt.subplots()
     ax.plot(dates, temps, color='royalblue')
@@ -65,26 +71,28 @@ def plot_daily(datetemp):
     plt.rcParams['font.size'] = 8
 
     # Saving figure and closing
-    plt.savefig('test%s.png' % (str(docum).split('.')[0]))  #not working since splitting functions
+    plt.savefig('%s.png' % (str(docum).split('.')[0]))
     plt.clf()
 
 
 
-
-def all_daily_means():
-    """ Running monthly_mean for all the files in the directory """
+def run_all_daily_means():
+    """ Running plot_daily for all the files in the directory """
 
     for f in glob.glob(path):
         print 'Processing ' + f.split('/')[-1]
-        daily_mean(f)
+        plot_daily(f)
 
+
+
+######################## BY YEAR ########################
 
 
 
 def monthly_mean(docum):
-    """ Takes the daily low, mean and max temperatures of the month
-        Septemper and returns the mean_low temp, mean_mean temp,
-        and mean_max temp for the month """
+    """ Takes the daily low, mean and max temperatures and returns
+        the mean_low temp, mean_mean temp, and mean_max temp for the month """
+
     parsed = parse(docum, ',')
 
     low_temps = [int(item['Min TemperatureC']) for item in parsed]
@@ -100,12 +108,13 @@ def monthly_mean(docum):
 
 
 
-def all_monthly_means():
+def run_all_monthly_means():
     """ Collects the means from all files through monthly_mean
-        function and rearranges data to all_lows, all_means, all_maxes """
+        function and rearranges data to all_lows, all_means, all_maximums """
 
     all_lmm = []
-    for f in glob.glob(path):
+    for f in sorted(glob.glob(path)):
+        print 'processing', f
         all_lmm.append(monthly_mean(f))
 
     all_lows = [lst[0] for lst in all_lmm]
@@ -116,31 +125,28 @@ def all_monthly_means():
 
 
 
-def plot_yearly(means):
-    """ Makes a figure with 3 plots (lows, means, maxes) """
+def plot_yearly():
+    """ Makes a figure with 3 plots (lows, means, maximums) """
 
+    means = run_all_monthly_means()
     all_lows, all_means, all_maxs = means[0], means[1], means[2]
 
-    x = range(2000, 2015)
+    x = range(2000, 2016)
 
     fig, ax = plt.subplots()
     ax.plot(x, all_lows, label='Lows', color='royalblue')
     ax.plot(x, all_means, label='Means', color='gold')
     ax.plot(x, all_maxs, label='Maxes', color='r')
 
-    ax.legend()
+    ax.axis('tight')
+    ax.legend(loc=4,prop={'size':11})
     plt.grid()
     plt.title('September through the years')
     plt.ylabel('Temperatures C')
     plt.xticks(np.arange(min(x), max(x)+1, 1.0), rotation=90, color='grey')
     plt.yticks(np.arange(13, 31), color='firebrick')
     plt.subplots_adjust(bottom=0.1)
-    minorLocator = MultipleLocator(1)
-    ax.xaxis.set_minor_locator(minorLocator)
     plt.rcParams['font.size'] = 8
 
-    plt.savefig('2000-2014.png')
+    plt.savefig('2000-2015.png')
     plt.clf()
-
-
-plot_yearly(all_monthly_means())
